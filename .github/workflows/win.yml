@@ -38,8 +38,18 @@ jobs:
       - name: Clone.
         uses: actions/checkout@v7
         with:
-          submodules: recursive
           path: ${{ env.TBUILD }}\${{ env.REPO_NAME }}
+
+      - name: Submodules.
+        shell: bash
+        run: |
+          git config --global url."https://chromium.googlesource.com/libyuv/libyuv".insteadOf "https://gitlab.com/chromiumsrc/libyuv.git"
+          cd "$TBUILD/$REPO_NAME"
+          for i in 1 2 3 4 5 6; do
+            git submodule update --init --recursive && exit 0
+            echo "Submodules failed, retry $i"; sleep 120
+          done
+          exit 1
 
       - name: First set up.
         shell: bash
@@ -50,7 +60,6 @@ jobs:
           sed -i '/CMAKE_${lang}_FLAGS_DEBUG_INIT/s/${_Zi}//' "$PROGRAMFILES"/CMake/share/cmake*/Modules/Platform/Windows-MSVC.cmake
           git config --global user.email "you@example.com"
           git config --global user.name "Sample"
-          git config --global url."https://chromium.googlesource.com/libyuv/libyuv".insteadOf "https://gitlab.com/chromiumsrc/libyuv.git"
 
       - uses: Eden-CI/msvc-dev-cmd@master
         name: Native Tools Command Prompt.
@@ -81,12 +90,12 @@ jobs:
           %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent
 
       - name: Free up some disk space.
-        if: always()
+        if: always() && steps.libs.outcome != 'skipped'
         shell: bash
         run: find $LibrariesPath '(' '(' ! '(' -name '*.lib' -o -name '*.a' -o -name '*.exe' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/nv-codec-headers/*' ')' -type f ')' -o -empty ')' -delete
 
       - name: Save libraries.
-        if: always()
+        if: always() && steps.libs.outcome != 'skipped'
         uses: actions/cache/save@v6
         with:
           path: |
@@ -120,8 +129,18 @@ jobs:
       - name: Clone.
         uses: actions/checkout@v7
         with:
-          submodules: recursive
           path: ${{ env.TBUILD }}\${{ env.REPO_NAME }}
+
+      - name: Submodules.
+        shell: bash
+        run: |
+          git config --global url."https://chromium.googlesource.com/libyuv/libyuv".insteadOf "https://gitlab.com/chromiumsrc/libyuv.git"
+          cd "$TBUILD/$REPO_NAME"
+          for i in 1 2 3 4 5 6; do
+            git submodule update --init --recursive && exit 0
+            echo "Submodules failed, retry $i"; sleep 120
+          done
+          exit 1
 
       - name: First set up.
         shell: bash
@@ -132,7 +151,6 @@ jobs:
           sed -i '/CMAKE_${lang}_FLAGS_DEBUG_INIT/s/${_Zi}//' "$PROGRAMFILES"/CMake/share/cmake*/Modules/Platform/Windows-MSVC.cmake
           git config --global user.email "you@example.com"
           git config --global user.name "Sample"
-          git config --global url."https://chromium.googlesource.com/libyuv/libyuv".insteadOf "https://gitlab.com/chromiumsrc/libyuv.git"
 
       - uses: Eden-CI/msvc-dev-cmd@master
         name: Native Tools Command Prompt.
