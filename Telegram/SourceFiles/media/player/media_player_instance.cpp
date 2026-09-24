@@ -473,13 +473,17 @@ auto Instance::playlistKey(not_null<const Data*> data) const
 	const auto universalId = (contextId.peer == history->peer->id)
 		? contextId.msg
 		: (contextId.msg - ServerMaxMsgId);
+	// Topic-scoped voice search fails with TOP_MSG_ID_NOT_SUPPORTED.
+	const auto topicRootId = (data->type == AudioMsgId::Type::Voice)
+		? MsgId()
+		: data->topicRootId;
 	return SliceKey(
 		data->history->peer->id,
 		(item->isScheduled()
 			? SparseIdsMergedSlice::kScheduledTopicId
 			: item->isSavedMusicItem()
 			? SparseIdsMergedSlice::kSavedMusicTopicId
-			: data->topicRootId),
+			: topicRootId),
 		data->monoforumPeerId,
 		data->migrated ? data->migrated->peer->id : 0,
 		universalId);
@@ -639,6 +643,16 @@ bool Instance::moveInPlaylist(
 		}
 		const auto index = base::RandomIndex(raw->nonPlayedIds.size());
 		return byUniversal(raw->nonPlayedIds[index]);
+	}
+	if (data->type == AudioMsgId::Type::Voice && data->topicRootId) {
+		for (auto index = *data->playlistIndex + delta
+			; const auto item = itemByIndex(data, index)
+			; index += delta) {
+			if (item->topicRootId() == data->topicRootId) {
+				return jumpByItem(item);
+			}
+		}
+		return false;
 	}
 
 	const auto newIndex = *data->playlistIndex
