@@ -50,6 +50,7 @@ jobs:
           sed -i '/CMAKE_${lang}_FLAGS_DEBUG_INIT/s/${_Zi}//' "$PROGRAMFILES"/CMake/share/cmake*/Modules/Platform/Windows-MSVC.cmake
           git config --global user.email "you@example.com"
           git config --global user.name "Sample"
+          git config --global url."https://chromium.googlesource.com/libyuv/libyuv".insteadOf "https://gitlab.com/chromiumsrc/libyuv.git"
 
       - uses: Eden-CI/msvc-dev-cmd@master
         name: Native Tools Command Prompt.
@@ -131,6 +132,7 @@ jobs:
           sed -i '/CMAKE_${lang}_FLAGS_DEBUG_INIT/s/${_Zi}//' "$PROGRAMFILES"/CMake/share/cmake*/Modules/Platform/Windows-MSVC.cmake
           git config --global user.email "you@example.com"
           git config --global user.name "Sample"
+          git config --global url."https://chromium.googlesource.com/libyuv/libyuv".insteadOf "https://gitlab.com/chromiumsrc/libyuv.git"
 
       - uses: Eden-CI/msvc-dev-cmd@master
         name: Native Tools Command Prompt.
